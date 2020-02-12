@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>cwansart</groupId>
+  <artifactId>liberty-fatjar-with-postgres-service-a</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <properties>
+    <final.name>liberty-fatjar-with-postgres</final.name>
+
+    <failOnMissingWebXml>false</failOnMissingWebXml>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <openliberty.maven.version>3.1</openliberty.maven.version>
+
+    <openliberty.version>[19.0.0.9,)</openliberty.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.microprofile</groupId>
+      <artifactId>microprofile</artifactId>
+      <version>3.2</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.10</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${final.name}</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy-jdbc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>postgresql</includeArtifactIds>
+              <outputDirectory>
+                ${project.build.directory}/liberty/wlp/usr/servers/defaultServer/resources/jdbc
+              </outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>io.openliberty.tools</groupId>
+        <artifactId>liberty-maven-plugin</artifactId>
+        <version>${openliberty.maven.version}</version>
+        <executions>
+          <execution>
+            <id>package-server</id>
+            <phase>package</phase>
+            <goals>
+              <goal>create</goal>
+              <goal>install-feature</goal>
+              <goal>deploy</goal>
+              <goal>package</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/wlp-package</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <include>runnable</include>
+          <serverName>${final.name}</serverName>
+          <bootstrapProperties>
+            <project.name>${final.name}</project.name>
+          </bootstrapProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
