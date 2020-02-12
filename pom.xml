@@ -19,6 +19,8 @@
     <openliberty.maven.version>3.1</openliberty.maven.version>
 
     <openliberty.version>[19.0.0.9,)</openliberty.version>
+
+    <version.postgresql>42.2.10</version.postgresql>
   </properties>
 
   <dependencies>
@@ -29,10 +31,18 @@
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <version>2.2</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.10</version>
+      <version>${version.postgresql}</version>
     </dependency>
   </dependencies>
 
@@ -43,19 +53,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
+        <version>3.1.1</version>
         <executions>
           <execution>
-            <id>copy-jdbc</id>
-            <phase>package</phase>
+            <phase>prepare-package</phase>
             <goals>
-              <goal>copy-dependencies</goal>
+              <goal>copy</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>postgresql</includeArtifactIds>
-              <outputDirectory>
-                ${project.build.directory}/liberty/wlp/usr/servers/defaultServer/resources/jdbc
-              </outputDirectory>
+              <outputDirectory>${project.build.directory}/liberty/wlp/usr/shared/config/lib/global</outputDirectory>
+              <overWriteIfNewer>true</overWriteIfNewer>
+              <useBaseVersion>true</useBaseVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${version.postgresql}</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
